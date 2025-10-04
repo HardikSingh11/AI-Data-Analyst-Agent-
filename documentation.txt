@@ -1,0 +1,160 @@
+1 . Introduction
+
+	AI Data Agent is a light‑weight, fully local toolkit that automates the day‑to‑day work of a data analyst.
+	It uses standard Python data‑science libraries together with an open‑source language model to:
+	• read raw datasets (.csv / .xlsx),
+	• create a full EDA report automatically,
+	• detect data anomalies,
+	• and build a written summary of analytical recommendations.
+	The assistant imitates what a junior analyst or consultant would produce after exploring data for management reporting — quick explanations, suggestions for better data handling, and ideas for dashboards or automations.
+
+2 . Project Folder Layout
+
+		text
+		AI_Data_Agent/
+│
+├── ai_agent.py           -> core functions for profiling and anomaly detection  
+├── ai_agent_app.py       -> Streamlit interface (main app to run)  
+├── generate_data.py      -> synthetic business‑data generator for demo/testing  
+│
+├── requirements.txt      -> library dependencies  
+├── README.md             -> brief repo overview for GitHub  
+└── outputs/
+      ├── eda_report.html
+      ├── ai_insights.txt
+      └── business_data.csv
+
+3 . Technology Stack
+Purpose	Library
+Data handling	 pandas, numpy
+Machine learning	 scikit‑learn (Isolation Forest for anomalies)
+Statistics	 scipy
+EDA reporting	 ydata‑profiling
+Web UI	 streamlit, streamlit‑pandas‑profiling
+Language model	 transformers + torch (Microsoft Phi‑2)
+Memory optimisation	 accelerate, bitsandbytes
+Miscellaneous	 tempfile, os (handling downloads and temporary files)
+
+4 . Main Files and Responsibilities
+
+ai_agent.py
+	Contains helper functions used by the app:
+	1. generate_report() – creates an interactive HTML EDA report via ProfileReport.
+	2. detect_anomalies() – uses Isolation Forest and Z‑score to flag abnormal values.
+	3. get_safe_device_map() – detects GPU VRAM and automatically decides whether to run the language model on GPU (8‑bit / FP16) or CPU float32.
+	4. generate_ai_insights() – loads Microsoft Phi‑2 model, prepares dataset summaries, builds a business‑style prompt, generates plain‑English recommendations.
+	Each function is independent, making the code modular and reusable.
+
+ai_agent_app.py
+	Implements the Streamlit UI.
+	Key sections:
+	1. Page setup and file upload box.
+	2. Shows initial data preview (top 10 rows).
+	3. Calls generate_report() to generate an HTML EDA profile, displayed inline.
+	4. Calls detect_anomalies() to highlight outlier records.
+	5. Runs generate_ai_insights() to produce consultant‑style written insights.
+	6. Allows the user to download those insights as a text file.
+	The app automatically switches to CPU if the GPU memory is too low, preventing crashes or overheating on smaller laptops.
+
+generate_data.py
+	Creates a realistic business dataset for practice and demos:
+	• ~1 200 rows across 2023‑2024.
+	• Columns: OrderID, OrderDate, Region, Channel, Product, Customer, Quantity, UnitPrice, Sales, Cost, Profit, Year, Month.
+	• Includes seasonality (higher November‑December sales), online/offline channel differences, and intentional anomalies (extreme order quantities, under‑priced items).
+	Generates business_data.csv in the root folder.
+
+5 . Automatic GPU/CPU Handling
+
+		The get_safe_device_map() function checks:
+		○ whether CUDA is available,
+		○ how much free VRAM is left. If a GPU ≥ 5 GB free → load model in FP16; otherwise it loads 8‑bit quantized;
+if no GPU → loads CPU float32.
+		
+		This ensures the project runs without forcing manual toggles or causing thermal/power shutdowns.
+
+6 . Installation and Setup
+
+		a. Create environment
+
+Bash : 
+		python -m venv venv
+venv\Scripts\activate  # Windows
+source venv/bin/activate  # Linux/Mac
+		
+		b. Install requirements
+
+Bash : pip install ‑r requirements.txt
+		
+		c. Launch Streamlit app
+
+Text  : streamlit run ai_agent_app.py
+		
+		d. Upload Data :
+Use any excel/csv file
+
+7 . How the App Works End‑to‑End
+
+		Step	What happens
+		 1 	 User uploads a CSV/Excel file.
+		 2 	 generate_report() creates eda_report.html and renders it in Streamlit.
+		 3 	 detect_anomalies() adds Z‑score and Isolation Forest flags.
+		 4 	 The program builds summary statistics + correlations textually.
+		 5 	 That context is fed to the Phi‑2 model for language‑based insights.
+		 6 	 Outputs are displayed on screen and offered for download as .txt.
+
+8 . Expected Outputs
+		
+		○ EDA Report (eda_report.html) – interactive profile highlighting distributions, missing values, and correlations.
+		○ Anomaly Detection Table – slice of records flagged as outliers.
+		○ AI‑Generated Insights (ai_insights.txt) – structured bullet points explaining data improvement ideas, visualisation recommendations, and automation paths.
+		Example snippet:
+		• Revenue spikes in mid‑year months; consider seasonal forecasting models.
+		• Outlier prices may indicate manual entry errors.
+		• Add dashboards showing margin variance by region and channel.
+		• Automate report refresh using a daily ETL pipeline.
+
+9 . Performance and Limitations
+
+		- Phi‑2 is small (2.7 B) so runs fine on GTX 1650; text coherence is good for short advisory notes.
+		- Quantized 8‑bit mode reduces VRAM use to ≈ 1.5 GB.
+		- CPU mode is safe on all machines but slower (~ 10‑15 s per generation).
+		- For larger datasets or longer text, consider streaming results or paginating the HTML report.
+
+10 . Future Enhancements
+
+		○ Add model selector (Gemma 2B, Phi‑2, Mistral) in sidebar.
+		○ Allow export to PDF/Power BI.
+		○ Integrate real‑time database connections (MySQL / PostgreSQL / Snowflake).
+		○ Add time‑series forecasting module.
+		○ Deploy on Streamlit Cloud or Hugging Face Spaces for public demos.
+
+11 . Project Purpose
+
+		This project demonstrates:
+		○ Automated EDA pipelines,
+		○ Practical anomaly detection,
+		○ Integration of lightweight LLMs for domain recommendations,
+		○ Safe handling of GPU resources in hybrid (local) data apps.
+		Ideal for showcasing skills in data analytics + automation + LLM‑integration in a portfolio or GitHub profile.
+
+12 . Version Control and Deployment
+
+		Bash
+		git init
+git add .
+git commit -m "Initial commit - AI Data Analyst Agent"
+git remote add origin <your_GitHub_repo_URL>
+git push -u origin main
+		After upload, your repository will host:
+		- three Python scripts
+		- a readme
+		- this documentation
+		- requirements file
+		- generated sample outputs.
+
+13 . Attribution
+
+		All components rely on open‑licensed libraries.
+		The Phi‑2 model is released by Microsoft Research under the MIT license.
+		EDA reports use ydata‑profiling (formerly Pandas Profiling) and Streamlit for web delivery.
+

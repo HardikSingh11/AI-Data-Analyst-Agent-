@@ -1,0 +1,12 @@
+pandas
+numpy
+scikit-learn
+scipy
+streamlit
+ydata-profiling
+streamlit-pandas-profiling
+transformers
+accelerate
+bitsandbytes
+sentencepiece
+torch
