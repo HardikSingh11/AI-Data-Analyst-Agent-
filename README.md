@@ -43,7 +43,7 @@ This small tool automates the first half of that cycle:
 	├── README.md # this file
 	└── Documentation.txt # detailed documentation
 
-(5) ## 🧩 Setup Bash
+(5) Setup Bash
 # create environment
 
 	python -m venv venv
@@ -55,7 +55,7 @@ venv\Scripts\activate               # on Windows
 	# run the application
         streamlit run ai_agent_app.py
 
-(6) 🧪 Try it quickly
+(6) Try it quickly
 
 	Generate a synthetic dataset using generate.py:
 	
@@ -84,3 +84,4 @@ venv\Scripts\activate               # on Windows
 	Hardik Singh
 
 Project built for learning and demonstrating data‑analysis automation and local LLM integration.
+
